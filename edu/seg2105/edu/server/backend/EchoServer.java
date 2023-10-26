@@ -4,6 +4,8 @@ package edu.seg2105.edu.server.backend;
 // license found at www.lloseng.com 
 
 
+import java.io.IOException;
+
 import ocsf.server.*;
 
 /**
@@ -106,5 +108,24 @@ public class EchoServer extends AbstractServer
       System.out.println("ERROR - Could not listen for clients!");
     }
   }
+  
+  //Hook methods
+  @Override
+  protected void clientConnected(ConnectionToClient c) {
+	  System.out.println("Client " + c.toString() + " has connected!");
+  }
+  @Override
+  protected void clientDisconnected(ConnectionToClient c) {
+	  System.out.println("Client has disconnected");
+  }
+  
+  @Override
+  protected void clientException(ConnectionToClient c, Throwable e) {
+	  System.out.println("Client is disconnecting...");
+	  try {
+		c.close();
+	  } catch (IOException e1) {}
+  }
+  
 }
 //End of EchoServer class
