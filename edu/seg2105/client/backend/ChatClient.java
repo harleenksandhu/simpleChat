@@ -71,7 +71,11 @@ public class ChatClient extends AbstractClient
   {
     try
     {
-      sendToServer(message);
+    	if(message.charAt(0) == '#') {
+    		handleCommand(message);
+    	} else {
+    		sendToServer(message);
+    	}
     }
     catch(IOException e)
     {
@@ -79,6 +83,45 @@ public class ChatClient extends AbstractClient
         ("Could not send message to server.  Terminating client.");
       quit();
     }
+  }
+  
+  /**
+   * This method handles a command from the client
+   */
+  private void handleCommand(String command) {
+	  if(command.equals("#quit")) {
+		  quit();
+	  } else if(command.equals("#logoff")) {
+		  try {
+			closeConnection();
+		  } catch (IOException e) {}
+	  } else if(command.startsWith("#sethost")) {
+		  if(isConnected()) {
+			  clientUI.display("You must log off before setting another host.");
+			  return;
+		  }
+		  String host = command.substring(10, command.length()-1); //creates a substring of what is in between < and >
+		  setHost(host);
+	  } else if(command.startsWith("#setport")) {
+		  if(isConnected()) {
+			  clientUI.display("You must log off before setting another port.");
+			  return;
+		  }
+		  int port = Integer.parseInt(command.substring(10, command.length()-1));
+		  setPort(port);
+	  } else if(command.equals("#login")) {
+		  if(isConnected()) {
+			  clientUI.display("You are already logged in.");
+			  return;
+		  }
+		  try {
+			openConnection();
+		  } catch (IOException e) {}
+	  } else if(command.equals("#gethost")) {
+		  clientUI.display(getHost());
+	  } else if(command.equals("#getport")) {
+		  clientUI.display(Integer.toString(getPort()));
+	  }
   }
   
   /**
