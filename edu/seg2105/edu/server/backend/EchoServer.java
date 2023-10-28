@@ -5,7 +5,7 @@ package edu.seg2105.edu.server.backend;
 
 
 import java.io.IOException;
-
+import edu.seg2105.client.common.*;
 import ocsf.server.*;
 
 /**
@@ -26,16 +26,21 @@ public class EchoServer extends AbstractServer
    */
   final public static int DEFAULT_PORT = 5555;
   
+  ChatIF serverUI;
+  
   //Constructors ****************************************************
   
   /**
    * Constructs an instance of the echo server.
    *
    * @param port The port number to connect on.
+   * @param serverUI The server console.
    */
-  public EchoServer(int port) 
+  public EchoServer(int port, ChatIF serverUI) 
   {
     super(port);
+    this.serverUI = serverUI;
+    
   }
 
   
@@ -74,40 +79,47 @@ public class EchoServer extends AbstractServer
       ("Server has stopped listening for connections.");
   }
   
+  public void handleMessageFromServerUI(String msg) {
+	  if(msg.charAt(0) == '#') {
+		  handleCommand(msg);
+	  }  else {
+		  serverUI.display(msg);
+		  sendToAllClients("SERVER MSG> " + msg);
+	  }
+	  
+  }
+  
+  private void handleCommand(String command) {
+	  if(command.equals("#quit")) {
+		  System.exit(0);
+	  } else if(command.equals("#stop")) {
+		  stopListening();
+	  } else if(command.equals("#close")) {
+		  try {
+			close();
+		  } catch (IOException e) {}
+	  } else if(command.startsWith("#setport")) {
+		  if(isListening()) {
+			  System.out.println("You must close the server before setting a new port.");
+			  return;
+		  }
+		  int port = Integer.parseInt(command.substring(10, command.length()-1));
+		  setPort(port);
+	  } else if(command.equals("#start")) {
+		  if(isListening()) {
+			  System.out.println("Already listening for connections.");
+		  } else {
+			  try {
+				listen();
+			  } catch (IOException e) {}
+		  }
+	  } else if(command.equals("#getport")) {
+		  System.out.println(Integer.toString(getPort()));
+	  }
+  }
   
   //Class methods ***************************************************
   
-  /**
-   * This method is responsible for the creation of 
-   * the server instance (there is no UI in this phase).
-   *
-   * @param args[0] The port number to listen on.  Defaults to 5555 
-   *          if no argument is entered.
-   */
-  public static void main(String[] args) 
-  {
-    int port = 0; //Port to listen on
-
-    try
-    {
-      port = Integer.parseInt(args[0]); //Get port from command line
-    }
-    catch(Throwable t)
-    {
-      port = DEFAULT_PORT; //Set port to 5555
-    }
-	
-    EchoServer sv = new EchoServer(port);
-    
-    try 
-    {
-      sv.listen(); //Start listening for connections
-    } 
-    catch (Exception ex) 
-    {
-      System.out.println("ERROR - Could not listen for clients!");
-    }
-  }
   
   //Hook methods
   @Override
