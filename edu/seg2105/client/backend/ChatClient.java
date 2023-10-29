@@ -27,7 +27,8 @@ public class ChatClient extends AbstractClient
    * the display method in the client.
    */
   ChatIF clientUI; 
-
+  
+  String loginID;
   
   //Constructors ****************************************************
   
@@ -44,7 +45,7 @@ public class ChatClient extends AbstractClient
   {
     super(host, port); //Call the superclass constructor
     this.clientUI = clientUI;
-    openConnection();
+    //openConnection();
   }
 
   
@@ -124,6 +125,13 @@ public class ChatClient extends AbstractClient
 	  }
   }
   
+  public void setLoginID(String loginID) {
+	  this.loginID = loginID;
+  }
+  public String getLoginID() {
+	  return loginID;
+  }
+  
   /**
    * This method terminates the client.
    */
@@ -148,6 +156,14 @@ public class ChatClient extends AbstractClient
   @Override
   protected void connectionClosed() {
 	  clientUI.display("Your connection has closed.");
+  }
+  
+  @Override
+  protected void connectionEstablished() {
+	  String message = "#login " + loginID;
+	  try {
+		sendToServer(message);
+	  } catch (IOException e) {}
   }
   
 

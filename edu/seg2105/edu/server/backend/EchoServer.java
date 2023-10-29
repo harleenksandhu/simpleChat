@@ -25,7 +25,7 @@ public class EchoServer extends AbstractServer
    * The default port to listen on.
    */
   final public static int DEFAULT_PORT = 5555;
-  
+  String loginKey = "loginID";
   ChatIF serverUI;
   
   //Constructors ****************************************************
@@ -55,8 +55,19 @@ public class EchoServer extends AbstractServer
   public void handleMessageFromClient
     (Object msg, ConnectionToClient client)
   {
-    System.out.println("Message received: " + msg + " from " + client);
-    this.sendToAllClients(msg);
+	  String message = (String) msg;
+	  if(message.startsWith("#login")) {
+		  if(client.getInfo(loginKey) != null) {
+			  try {
+				client.close();
+			  } catch (IOException e) {}
+		  } else {
+			  client.setInfo(loginKey, message.substring(7));
+		  }
+	  } else {
+		  System.out.println("Message received: " + msg + " from " + client);
+	  	  this.sendToAllClients(client.getInfo(loginKey) + ": " + message);
+	  }
   }
     
   /**
