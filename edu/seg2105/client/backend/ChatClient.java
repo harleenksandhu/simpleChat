@@ -45,7 +45,7 @@ public class ChatClient extends AbstractClient
   {
     super(host, port); //Call the superclass constructor
     this.clientUI = clientUI;
-    //openConnection();
+    openConnection();
   }
 
   
@@ -149,7 +149,7 @@ public class ChatClient extends AbstractClient
   //Hook methods 
   @Override
   protected void connectionException(Exception e) {
-	  clientUI.display("The server has shut down. Quitting...");
+	  clientUI.display("The server has shut down.");
 	  quit(); 
   }
   
@@ -164,6 +164,8 @@ public class ChatClient extends AbstractClient
 	  try {
 		sendToServer(message);
 	  } catch (IOException e) {}
+	  System.out.println(loginID + " has logged on.");
+	  
   }
   
 

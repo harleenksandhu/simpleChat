@@ -56,6 +56,7 @@ public class EchoServer extends AbstractServer
     (Object msg, ConnectionToClient client)
   {
 	  String message = (String) msg;
+	  System.out.println("Message received: " + msg + " from " + client.getInfo(loginKey));
 	  if(message.startsWith("#login")) {
 		  if(client.getInfo(loginKey) != null) {
 			  try {
@@ -65,9 +66,9 @@ public class EchoServer extends AbstractServer
 			  client.setInfo(loginKey, message.substring(7));
 		  }
 	  } else {
-		  System.out.println("Message received: " + msg + " from " + client);
-	  	  this.sendToAllClients(client.getInfo(loginKey) + ": " + message);
+	  	  this.sendToAllClients(client.getInfo(loginKey) + "> " + message);
 	  }
+
   }
     
   /**
@@ -95,7 +96,7 @@ public class EchoServer extends AbstractServer
 		  handleCommand(msg);
 	  }  else {
 		  serverUI.display(msg);
-		  sendToAllClients("SERVER MSG> " + msg);
+		  sendToAllClients("SERVER MESSAGE> " + msg);
 	  }
 	  
   }
@@ -114,7 +115,7 @@ public class EchoServer extends AbstractServer
 			  System.out.println("You must close the server before setting a new port.");
 			  return;
 		  }
-		  int port = Integer.parseInt(command.substring(10, command.length()-1));
+		  int port = Integer.parseInt(command.substring(9));
 		  setPort(port);
 	  } else if(command.equals("#start")) {
 		  if(isListening()) {
@@ -135,16 +136,15 @@ public class EchoServer extends AbstractServer
   //Hook methods
   @Override
   protected void clientConnected(ConnectionToClient c) {
-	  System.out.println("Client " + c.toString() + " has connected!");
+	  System.out.println("A new client has connected to the server.");
   }
   @Override
   protected void clientDisconnected(ConnectionToClient c) {
-	  System.out.println("Client has disconnected");
+	  System.out.println(c.getInfo(loginKey) + " has disconnected");
   }
   
   @Override
   protected void clientException(ConnectionToClient c, Throwable e) {
-	  System.out.println("Client is disconnecting...");
 	  try {
 		c.close();
 	  } catch (IOException e1) {}
