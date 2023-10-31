@@ -47,6 +47,7 @@ public class ClientConsole implements ChatIF
   /**
    * Constructs an instance of the ClientConsole UI.
    *
+   * @param loginID The login id of the client.
    * @param host The host to connect to.
    * @param port The port to connect on.
    */
@@ -54,8 +55,7 @@ public class ClientConsole implements ChatIF
   {
     try 
     {
-      client= new ChatClient(host, port, this);
-      client.setLoginID(loginID);
+      client= new ChatClient(loginID, host, port, this);
       
     } 
     catch(IOException exception) 
@@ -144,6 +144,10 @@ public class ClientConsole implements ChatIF
     
     
     ClientConsole chat= new ClientConsole(loginID, host, port);
+    try {
+		chat.client.sendToServer("#login abc");
+	} catch (IOException e) {
+	}
     chat.accept();  //Wait for console data
     
   }
